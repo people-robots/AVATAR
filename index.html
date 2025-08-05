@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta name="description"
+
+        content="AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video">
+
+  <meta name="keywords" content="AVATAR, Reinforcement Learning, Video Understanding, Audio-Visual Reasoning, GRPO, Multimodal, TAS">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video</title>
+
+
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <link rel="stylesheet" href="./static/css/index.css">
+
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+
+  <script src="./static/js/bulma-carousel.min.js"></script>
+
+  <script src="./static/js/bulma-slider.min.js"></script>
+
+
+
+  <style>
+
+    .placeholder-box {
+
+      padding: 10px;
+
+      margin: 10px 0;
+
+      text-align: center;
+
+      color: #777;
+
+    }
+
+    .placeholder-box img {
+
+        max-width: 100%;
+
+        height: auto;
+
+        display: block;
+
+        margin: 0 auto;
+
+    }
+
+
+    .animated-gradient-title {
+
+      background-image: linear-gradient(to right, #ff7e5f, #feb47b, #4a90e2, #8e44ad, #c86dd7);
+
+      background-size: 300% auto;
+
+      color: transparent;
+
+      background-clip: text;
+
+      -webkit-background-clip: text;
+
+      animation: gradient-animation 5s linear infinite;
+
+      display: inline-block;
+
+      vertical-align: middle;
+
+    }
+
+
+
+    @keyframes gradient-animation {
+
+      0% { background-position: 0% center; }
+
+      50% { background-position: 100% center; }
+
+      100% { background-position: 0% center; }
+
+    }
+
+
+
+    .title-icon-image {
+
+       height: 1em; 
+
+       width: auto; 
+
+       vertical-align: middle; 
+
+       margin-left: 10px;
+
+       display: inline-block; 
+
+       animation: wobble 2s ease-in-out infinite;
+
+    }
+
+
+
+    @keyframes wobble {
+
+      0%, 100% { transform: rotate(0deg) scale(1); }
+
+      25% { transform: rotate(-5deg) scale(1.1); }
+
+      75% { transform: rotate(5deg) scale(0.9); }
+
+    }
+
+
+
+  </style>
+
+
+
+</head>
+
+
+
+<body> <nav class="navbar" role="navigation" aria-label="main navigation">
+
+    <div class="navbar-brand">
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+
+        <span aria-hidden="true"></span>
+
+        <span aria-hidden="true"></span>
+
+        <span aria-hidden="true"></span>
+
+      </a>
+
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+
+      <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+
+         <div class="navbar-item has-dropdown is-hoverable">
+
+          <a class="navbar-link">
+
+            More Research
+
+          </a>
+
+          <div class="navbar-dropdown">
+
+            <a class="navbar-item" href="https://people-robots.github.io/VideoSAVi/">
+
+               VideoSAVi
+
+             </a>
+
+             <a class="navbar-item" href="https://yogkul2000.github.io/VideoPASTA/">
+
+               VideoPASTA
+
+             </a>
+
+             </div>
+
+        </div>
+
+       </div>
+
+    </div>
+
+  </nav>
+
+  <section class="hero">
+
+  <div class="hero-body">
+
+    <div class="container is-max-desktop">
+
+      <div class="columns is-centered">
+
+        <div class="column has-text-centered">
+
+          <h1 class="title is-1 publication-title is-bold">
+
+             <span class="animated-gradient-title">AVATAR</span><img src="static/images/logo.jpg" alt="AVATAR Icon" class="title-icon-image">
+
+          </h1>
+
+           <h2 class="subtitle is-3 publication-subtitle">
+
+             Reinforcement Learning to See, Hear, and Reason Over Video
+
+           </h2>
+
+           <div class="is-size-5 publication-authors">
+
+            <span class="author-block"><a href="https://yogkul2000.github.io/">Yogesh Kulkarni</a><sup style="color:#6fbf73;">1</sup>,</span>
+
+            <span class="author-block"><a href="https://www.pooyanfazli.com/">Pooyan Fazli</a><sup style="color:#6fbf73;">1</sup></span>
+
+             </div>
+
+
+
+          <div class="is-size-5 publication-authors">
+
+             <span class="author-block"><sup style="color:#6fbf73;">1</sup>Arizona State University</span><br>
+
+           </div>
+
+
+
+          <div class="column has-text-centered">
+
+            <div class="publication-links">
+
+              <span class="link-block">
+
+                 <a href="https://arxiv.org/pdf/placeholder" class="external-link button is-normal is-rounded is-dark"> <span class="icon">
+
+                      <i class="fas fa-file-pdf"></i>
+
+                  </span>
+
+                  <span>Paper</span>
+
+                </a>
+
+              </span>
+
+               <span class="link-block">
+
+                 <a href="https://arxiv.org/abs/placeholder" class="external-link button is-normal is-rounded is-dark"> <span class="icon">
+
+                      <i class="ai ai-arxiv"></i>
+
+                  </span>
+
+                  <span>arXiv</span>
+
+                </a>
+
+              </span>
+
+               <span class="link-block">
+
+                 <a href="https://github.com/yogkul2000/AVATAR" class="external-link button is-normal is-rounded is-dark"> <span class="icon">
+
+                      <i class="fab fa-github"></i>
+
+                  </span>
+
+                  <span>Code</span>
+
+                  </a>
+
+              </span>
+
+             </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<section class="hero teaser">
+
+  <div class="container is-max-desktop">
+
+    <div class="content has-text-centered">
+
+       <div class="placeholder-box">
+
+         <img src="static/images/teaser.jpg" alt="AVATAR Framework Overview" style="width: 50%;">
+
+       </div>
+
+       <p>Overview of the AVATAR framework. AVATAR enhances standard GRPO with two key components: (1) an off-policy architecture using a stratified replay buffer to improve data efficiency, and (2) Temporal Advantage Shaping (TAS), a novel credit assignment strategy that focuses learning on critical reasoning steps.</p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+
+
+<section class="section">
+
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered has-text-centered">
+
+      <div class="column is-four-fifths">
+
+        <h2 class="title is-3">Abstract</h2>
+
+        <div class="content has-text-justified">
+
+          <p>
+
+            Multimodal reasoning over long-horizon video is challenging due to the need for precise spatiotemporal fusion and alignment across modalities. While recent methods such as Group Relative Policy Optimization (GRPO) have shown promise in this domain, they suffer from three key limitations: (1) data inefficiency from their on-policy design, (2) a vanishing advantage problem, where identical or near-identical rewards within a group eliminate the learning signal by producing zero-valued advantages, and (3) uniform credit assignment that fails to emphasize critical reasoning steps.
+
+          </p>
+
+          <p>
+
+            We introduce AVATAR (Audio-Video Agent for Alignment and Reasoning), a framework that addresses these limitations through two core components: (1) an off-policy training architecture that improves sample efficiency and resolves vanishing advantages by reusing past experiences with greater reward diversity, and (2) Temporal Advantage Shaping (TAS), a novel credit assignment strategy that upweights key reasoning phases during learning.
+
+          </p>
+
+           <p>
+
+            AVATAR achieves strong performance across various benchmarks, outperforming the Qwen2.5-Omni baseline by +5.4 on MMVU, +4.9 on OmniBench, and +4.5 on Video-Holmes, while demonstrating over 35% higher sample efficiency. These results demonstrate that targeted RL improvements, rather than massive architectural changes, effectively address core multimodal reasoning challenges.
+
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<section class="section">
+
+    <div class="container is-max-desktop">
+
+        <div class="columns is-centered">
+
+            <div class="column is-four-fifths">
+
+              <h2 class="title is-3 has-text-centered">Method</h2>
+
+              <div class="content has-text-justified">
+
+                <p>
+
+                  AVATAR is an off-policy reinforcement learning framework that enhances Group Relative Policy Optimization (GRPO) for multimodal video understanding. The framework addresses three core limitations of standard GRPO through two main innovations.
+
+                </p>
+
+               
+
+                <p>
+
+                    <b>Off-Policy Architecture with Stratified Replay Buffer:</b> AVATAR employs a stratified replay buffer divided into three dynamic tiers: Easy (25%), Medium (35%), and Hard (40%). Experiences are assigned based on the policy's moving average reward for each prompt, forming a progressive learning curriculum. This addresses data inefficiency by reusing past experiences and mitigates the vanishing advantage problem by maintaining reward diversity.
+
+                </p>
+
+                <p>
+
+                    <b>Temporal Advantage Shaping (TAS):</b> TAS addresses uniform credit assignment by applying a U-shaped weighting curve that amplifies advantages during crucial planning (beginning) and synthesis (end) stages. For a reasoning sequence of length L, each token's position t is normalized to [0,1], and weights are computed as: w_t = 1.0 + λ_TAS · (2t̃ - 1)², where t̃ = t/(L-1).
+
+                </p>
+
+                <div class="placeholder-box">
+
+                  <img src="static/images/tas.jpg" alt="Temporal Advantage Shaping U-shaped Curve" width="70%">
+
+                </div>
+
+                <p>
+
+                    <b>Three-Stage Training Pipeline:</b> AVATAR is evaluated through a progressive curriculum: Stage 1 develops general visual reasoning, Stage 2 introduces audio-visual alignment, and Stage 3 addresses fine-grained audio-based object localization. Each stage leverages specific reward functions including format rewards, accuracy rewards, self-rewarding mechanisms, and stepwise reasoning judges.
+
+                </p>
+                 <div class="placeholder-box">
+
+                  <img src="static/images/pipeline.jpg" alt="Three-Stage RL Training Pipeline">
+
+                </div>
+
+                <p>
+
+                    <b>Video-Context Reference Score (VCRS):</b> To ensure stable learning signals, AVATAR introduces VCRS, which acts as a multiplicative factor in advantage calculation using a moving average of rewards over the last 20 processed instances, preventing zero-valued advantages that would stall learning.
+
+                </p>
+
+             </div>
+
+            </div>
+
+          </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="section">
+
+  <div class="container is-max-desktop">
+
+    <h2 class="title is-3 has-text-centered">Results</h2>
+
+
+
+    <div class="columns is-centered">
+
+      <div class="column is-four-fifths">
+
+        <h3 class="title is-4 has-text-centered">Audio-Visual Reasoning Performance</h3>
+
+        <div class="content has-text-justified">
+
+           <p>
+
+               AVATAR significantly outperforms the Qwen2.5-Omni baseline on audio-visual reasoning tasks, with absolute gains of +4.9 on OmniBench, +3.0 on DailyOmni, and +2.3 on AV-Odyssey. The framework also outperforms other GRPO-based methods, surpassing AV-Reasoner by 0.8 and Omni-R1 by 2.2 on OmniBench alignment tasks.
+
+           </p>
+
+           <div class="placeholder-box">
+
+               <img src="static/images/av_table.png" alt="Audio-Visual Benchmark Results (Table 1)">
+
+           </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="columns is-centered">
+
+      <div class="column is-four-fifths">
+
+        <h3 class="title is-4 has-text-centered">General Video Understanding Results</h3>
+
+        <div class="content has-text-justified">
+
+           <p>
+
+               AVATAR achieves state-of-the-art performance on general video understanding benchmarks, including MVBench (66.4) and LVBench (38.4), and excels in complex reasoning tasks. Notable improvements include +4.5 on Video-Holmes and +5.4 on MMVU, demonstrating the effectiveness of the stratified replay buffer and TAS for multi-step causal inference.
+
+           </p>
+
+           <div class="placeholder-box">
+
+               <img src="static/images/gv_table.png" alt="General Video Understanding Results (Table 2)">
+
+           </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+      <div class="columns is-centered">
+
+        <div class="column is-four-fifths">
+
+          <h3 class="title is-4 has-text-centered">Sample Efficiency & Ablation Studies</h3>
+
+          <div class="content has-text-justified">
+
+            <p>
+
+                AVATAR demonstrates superior sample efficiency, reaching 0.75 accuracy reward in just 2,500 iterations compared to baseline GRPO plateauing at 0.4, representing a 35% efficiency gain. Component-wise analysis shows that both the replay buffer and TAS contribute complementary benefits.
+
+            </p>
+
+            <div class="placeholder-box">
+
+                  <img src="static/images/sample_eff.png" alt="Sample Efficiency Comparison (Figure 4)" width="70%">
+
+             </div>
+
+             <div class="placeholder-box">
+
+                  <img src="static/images/component_wise.png" alt="Component-wise Ablation Study (Table 3)">
+
+             </div>
+
+             <p>
+
+                The ablation studies validate the effectiveness of each component. The curriculum design shows clear progression with Stage 1 RL yielding the largest improvements over SFT, while the U-shaped TAS weighting consistently outperforms linear alternatives and uniform baselines.
+
+             </p>
+
+              <div class="placeholder-box">
+
+                  <img src="static/images/ablation_2.png" alt="Curriculum Design and TAS Ablation (Table 4)">
+
+              </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="columns is-centered">
+
+        <div class="column is-four-fifths">
+
+          <h3 class="title is-4 has-text-centered">Qualitative Examples</h3>
+
+          <div class="content has-text-justified">
+
+             <p>
+
+                Qualitative examples demonstrate AVATAR's superior cross-modal integration compared to baseline GRPO. AVATAR effectively links visual cues (e.g., "tense expression, eyes darting around") with audio analysis ("hurried and tense tone"), while baseline GRPO makes disconnected observations. The framework shows improved temporal reasoning by tracking emotional progression and enhanced contextual understanding through precise dialogue interpretation.
+
+             </p>
+
+             <div class="placeholder-box">
+
+                 <img src="static/images/qual.png" alt="Qualitative Comparison Examples (Figure 9)">
+
+             </div>
+
+             <p>
+
+                In the examples above, AVATAR demonstrates better cross-modal integration by linking visual cues ("tense expression, his eyes darting around") with audio analysis ("hurried and tense tone when he speaks"), while baseline GRPO makes disconnected observations. AVATAR also shows improved temporal reasoning by tracking emotional progression ("tone shifting from calm to anxious") and enhanced contextual understanding through precise dialogue interpretation ("Sorry, I have a train to catch" indicating abrupt departure).
+
+             </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+</section>
+
+
+
+
+
+<section class="section" id="BibTeX">
+
+  <div class="container is-max-desktop content">
+
+    <h2 class="title is-3 has-text-centered">BibTeX</h2>
+
+    <pre><code>@article{kulkarni2025avatar,
+      title={AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video}, 
+      author={Yogesh Kulkarni and Pooyan Fazli},
+      year={2025},
+}</code></pre>
+
+  </div>
+
+</section>
+
+
+
+
+
+<footer class="footer">
+
+  <div class="container">
+
+    <div class="content has-text-centered">
+
+     </div>
+
+    <div class="columns is-centered">
+
+      <div class="column is-8">
+
+        <div class="content has-text-centered">
+
+          <p>
+
+            Website template adapted from <a href="https://nerfies.github.io/">Nerfies</a>.
+
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</footer>
+
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+  if ($navbarBurgers.length > 0) {
+
+    $navbarBurgers.forEach( el => {
+
+      el.addEventListener('click', () => {
+
+        const target = el.dataset.target;
+
+        const $target = document.getElementById(target);
+
+        el.classList.toggle('is-active');
+
+        if ($target) {
+
+            $target.classList.toggle('is-active');
+
+        }
+
+      });
+
+    });
+
+  }
+
+
+
+});
+
+</script>
+
+
+
+</body>
+
+</html>
