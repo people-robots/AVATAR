@@ -1,687 +1,702 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-
   <meta charset="utf-8">
-
-  <meta name="description"
-
-        content="AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video">
-
-  <meta name="keywords" content="AVATAR, Reinforcement Learning, Video Understanding, Audio-Visual Reasoning, GRPO, Multimodal, TAS">
-
+  <meta name="description" content="AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video">
+  <meta name="keywords" content="AVATAR, Reinforcement Learning, Video Understanding, Audio-Visual Reasoning, GRPO, TAS">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <title>AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video</title>
 
-
-
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
-
-
-
   <link rel="stylesheet" href="./static/css/bulma.min.css">
-
   <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-
   <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
-
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-
   <link rel="stylesheet" href="./static/css/index.css">
 
-
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
   <script defer src="./static/js/fontawesome.all.min.js"></script>
-
   <script src="./static/js/bulma-carousel.min.js"></script>
-
   <script src="./static/js/bulma-slider.min.js"></script>
 
-
-
   <style>
+    /* ── Layout helpers ── */
+    .fig-center { text-align: center; margin: 1rem 0; }
+    .fig-center img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+    .fig-caption { font-size: 0.82rem; color: #555; text-align: center; margin-top: 0.4rem; }
+    .section-divider { border: none; border-top: 1px solid #e0e0e0; margin: 2rem 0; }
 
-    .placeholder-box {
-
-      padding: 10px;
-
-      margin: 10px 0;
-
-      text-align: center;
-
-      color: #777;
-
-    }
-
-    .placeholder-box img {
-
-        max-width: 100%;
-
-        height: auto;
-
-        display: block;
-
-        margin: 0 auto;
-
-    }
-
-
+    /* ── Title animation ── */
     .animated-gradient-title {
-
-      background-image: linear-gradient(to right, #ff7e5f, #feb47b, #4a90e2, #8e44ad, #c86dd7);
-
-      background-size: 300% auto;
-
-      color: transparent;
-
-      background-clip: text;
-
-      -webkit-background-clip: text;
-
-      animation: gradient-animation 5s linear infinite;
-
-      display: inline-block;
-
-      vertical-align: middle;
-
+      background-image: linear-gradient(to right,#ff7e5f,#feb47b,#4a90e2,#8e44ad,#c86dd7);
+      background-size: 300% auto; color: transparent;
+      background-clip: text; -webkit-background-clip: text;
+      animation: grad 5s linear infinite; display: inline-block; vertical-align: middle;
     }
-
-
-
-    @keyframes gradient-animation {
-
-      0% { background-position: 0% center; }
-
+    @keyframes grad {
+      0%  { background-position: 0% center; }
       50% { background-position: 100% center; }
-
-      100% { background-position: 0% center; }
-
+      100%{ background-position: 0% center; }
     }
-
-
-
     .title-icon-image {
-
-       height: 1em; 
-
-       width: auto; 
-
-       vertical-align: middle; 
-
-       margin-left: 10px;
-
-       display: inline-block; 
-
-       animation: wobble 2s ease-in-out infinite;
-
+      height: 1em; width: auto; vertical-align: middle; margin-left: 8px;
+      display: inline-block; animation: wobble 2s ease-in-out infinite;
     }
-
-
-
     @keyframes wobble {
-
-      0%, 100% { transform: rotate(0deg) scale(1); }
-
-      25% { transform: rotate(-5deg) scale(1.1); }
-
-      75% { transform: rotate(5deg) scale(0.9); }
-
+      0%,100%{ transform: rotate(0deg) scale(1); }
+      25%    { transform: rotate(-5deg) scale(1.1); }
+      75%    { transform: rotate(5deg) scale(0.9); }
     }
 
-
-
+    /* ── Result tables ── */
+    .result-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 0.5rem 0 1rem; }
+    .result-table th, .result-table td { padding: 6px 10px; text-align: center; border: 1px solid #ddd; }
+    .result-table th { background: #f5f5f5; font-weight: 600; }
+    .result-table td:first-child, .result-table th:first-child { text-align: left; }
+    .result-table td:nth-child(2), .result-table th:nth-child(2) { text-align: left; }
+    .row-section { background: #efefef; font-style: italic; font-weight: 600; }
+    .row-winner { background: #fffff0; }
+    .gain-green { color: #006400; font-size: 0.76rem; }
+    .gain-gray  { color: #888;    font-size: 0.76rem; }
+    .avatar-name { font-weight: 700; }
+    .table-caption { font-size: 0.84rem; color: #444; margin-bottom: 0.5rem; }
+    .indent { padding-left: 1.2rem !important; }
+    /* ── PDF embeds ── */
+    .pdf-row { display: flex; gap: 12px; justify-content: center; margin: 0.8rem 0; }
+    .pdf-row embed { flex: 1; min-height: 260px; border: none; }
   </style>
-
-
-
 </head>
 
+<body>
 
-
-<body> <nav class="navbar" role="navigation" aria-label="main navigation">
-
-    <div class="navbar-brand">
-
-      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-
-        <span aria-hidden="true"></span>
-
-        <span aria-hidden="true"></span>
-
-        <span aria-hidden="true"></span>
-
-      </a>
-
-    </div>
-
-    <div id="navbarBasicExample" class="navbar-menu">
-
-      <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
-
-         <div class="navbar-item has-dropdown is-hoverable">
-
-          <a class="navbar-link">
-
-            More Research
-
-          </a>
-
-          <div class="navbar-dropdown">
-
-            <a class="navbar-item" href="https://people-robots.github.io/VideoSAVi/">
-
-               VideoSAVi
-
-             </a>
-
-             <a class="navbar-item" href="https://people-robots.github.io/VideoPASTA/">
-
-               VideoPASTA
-
-             </a>
-
-                          <a class="navbar-item" href="https://people-robots.github.io/EgoVITA/">
-
-               EgoVITA
-
-             </a>
-
-             </div>
-
+<!-- ── Navbar ── -->
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+      <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div id="navbarMenu" class="navbar-menu">
+    <div class="navbar-start" style="flex-grow:1;justify-content:center;">
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">More Research</a>
+        <div class="navbar-dropdown">
+          <a class="navbar-item" href="https://people-robots.github.io/VideoSAVi/">VideoSAVi</a>
+          <a class="navbar-item" href="https://people-robots.github.io/VideoPASTA/">VideoPASTA</a>
+          <a class="navbar-item" href="https://people-robots.github.io/EgoVITA/">EgoVITA</a>
         </div>
-
-       </div>
-
-    </div>
-
-  </nav>
-
-  <section class="hero">
-
-  <div class="hero-body">
-
-    <div class="container is-max-desktop">
-
-      <div class="columns is-centered">
-
-        <div class="column has-text-centered">
-
-          <h1 class="title is-1 publication-title is-bold">
-
-             <span class="animated-gradient-title">AVATAR</span><img src="static/images/logo.jpg" alt="AVATAR Icon" class="title-icon-image">
-
-          </h1>
-
-           <h2 class="subtitle is-3 publication-subtitle">
-
-             Reinforcement Learning to See, Hear, and Reason Over Video
-
-           </h2>
-
-           <div class="is-size-5 publication-authors">
-
-            <span class="author-block"><a href="https://yogkul2000.github.io/">Yogesh Kulkarni</a><sup style="color:#6fbf73;">1</sup>,</span>
-
-            <span class="author-block"><a href="https://www.pooyanfazli.com/">Pooyan Fazli</a><sup style="color:#6fbf73;">1</sup></span>
-
-             </div>
-
-
-
-          <div class="is-size-5 publication-authors">
-
-             <span class="author-block"><sup style="color:#6fbf73;">1</sup>Arizona State University</span><br>
-             <span class="paper-block"><b style="color:#f41c1c">CVPR 2026</b></span>
-
-           </div>
-
-
-
-          <div class="column has-text-centered">
-
-            <div class="publication-links">
-
-              <span class="link-block">
-
-                 <a href="https://arxiv.org/pdf/2508.03100" class="external-link button is-normal is-rounded is-dark"> <span class="icon">
-
-                      <i class="fas fa-file-pdf"></i>
-
-                  </span>
-
-                  <span>Paper</span>
-
-                </a>
-
-              </span>
-
-               <span class="link-block">
-
-                 <a href="https://arxiv.org/abs/2508.03100" class="external-link button is-normal is-rounded is-dark"> <span class="icon">
-
-                      <i class="ai ai-arxiv"></i>
-
-                  </span>
-
-                  <span>arXiv</span>
-
-                </a>
-
-              </span>
-
-               <span class="link-block">
-
-                 <a href="https://github.com/yogkul2000/AVATAR" class="external-link button is-normal is-rounded is-dark"> <span class="icon">
-
-                      <i class="fab fa-github"></i>
-
-                  </span>
-
-                  <span>Code</span>
-
-                  </a>
-
-              </span>
-
-             </div>
-
-          </div>
-
-        </div>
-
       </div>
-
     </div>
-
   </div>
+</nav>
 
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title is-bold">
+            <span class="animated-gradient-title">AVATAR</span><img src="static/images/logo.jpg" alt="AVATAR icon" class="title-icon-image">
+          </h1>
+          <h2 class="subtitle is-3 publication-subtitle">
+            Reinforcement Learning to See, Hear, and Reason Over Video
+          </h2>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><a href="https://yogkul2000.github.io/">Yogesh Kulkarni</a><sup style="color:#6fbf73">1</sup>,</span>
+            <span class="author-block"><a href="https://www.pooyanfazli.com/">Pooyan Fazli</a><sup style="color:#6fbf73">1</sup></span>
+          </div>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup style="color:#6fbf73">1</sup>Arizona State University</span><br>
+            <span class="paper-block"><b style="color:#f41c1c">CVPR 2026</b></span>
+          </div>
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://arxiv.org/pdf/2508.03100" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span><span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2508.03100" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span><span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/yogkul2000/AVATAR" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-
-
+<!-- ── Teaser ── -->
 <section class="hero teaser">
-
   <div class="container is-max-desktop">
-
     <div class="content has-text-centered">
-
-       <div class="placeholder-box">
-
-         <img src="static/images/teaser.jpg" alt="AVATAR Framework Overview" style="width: 50%;">
-
-       </div>
-
-       <p>Overview of the AVATAR framework. AVATAR enhances standard GRPO with two key components: (1) an off-policy architecture using a stratified replay buffer to improve data efficiency, and (2) Temporal Advantage Shaping (TAS), a novel credit assignment strategy that focuses learning on critical reasoning steps.</p>
-
+      <div class="fig-center">
+        <img src="static/images/teaser.png" alt="AVATAR Teaser" style="max-width:400px;width:100%;height:auto;">
+      </div>
+      <p>
+        AVATAR addresses three core GRPO limitations: data inefficiency via a stratified off-policy replay buffer,
+        the vanishing advantage problem via reward-diverse group sampling, and uniform credit assignment via
+        Temporal Advantage Shaping (TAS).
+      </p>
     </div>
-
   </div>
-
 </section>
 
-
-
-
-
+<!-- ── Abstract ── -->
 <section class="section">
-
   <div class="container is-max-desktop">
-
     <div class="columns is-centered has-text-centered">
-
       <div class="column is-four-fifths">
-
         <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Multimodal reasoning over long-horizon video is challenging due to the need for precise spatiotemporal
+            fusion and alignment across modalities. While recent methods such as Group Relative Policy Optimization
+            (GRPO) have shown promise in this domain, they suffer from three key limitations: (1) data inefficiency
+            from their on-policy design, (2) a vanishing advantage problem, where identical or near-identical rewards
+            within a group eliminate the learning signal by producing zero-valued advantages, and (3) uniform credit
+            assignment that fails to emphasize critical reasoning steps.
+          </p>
+          <p>
+            We introduce <b>AVATAR</b> (<b>A</b>udio-<b>V</b>ideo <b>A</b>gen<b>t</b> for <b>A</b>lignment and
+            <b>R</b>easoning), a framework that addresses these limitations through two core components: (1) an
+            off-policy training architecture that improves sample efficiency and resolves vanishing advantages by
+            reusing past experiences with greater reward diversity, and (2) Temporal Advantage Shaping (TAS), a
+            credit assignment strategy that emphasizes early (planning) and late (synthesis) reasoning phases.
+          </p>
+          <p>
+            <b>AVATAR</b> achieves strong performance across various benchmarks, outperforming the Qwen2.5-Omni
+            baseline by <b>+5.4</b> on MMVU, <b>+4.9</b> on OmniBench, and <b>+4.5</b> on Video-Holmes.
+            Furthermore, it surpasses standard GRPO by <b>+3.7</b> on OmniBench and <b>+1.9</b> on Video-Holmes,
+            while demonstrating <b>5&times; sample efficiency</b>, requiring 80% fewer generated completions
+            to reach target performance.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
+<!-- ── Method ── -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 has-text-centered">Method</h2>
         <div class="content has-text-justified">
 
+          <h3 class="title is-4">Off-Policy Architecture with Stratified Replay Buffer</h3>
           <p>
-
-            Multimodal reasoning over long-horizon video is challenging due to the need for precise spatiotemporal fusion and alignment across modalities. While recent methods such as Group Relative Policy Optimization (GRPO) have shown promise in this domain, they suffer from three key limitations: (1) data inefficiency from their on-policy design, (2) a vanishing advantage problem, where identical or near-identical rewards within a group eliminate the learning signal by producing zero-valued advantages, and (3) uniform credit assignment that fails to emphasize critical reasoning steps.
-
+            AVATAR employs a stratified replay buffer <em>B</em> (size 10k) divided into three tiers:
+            Easy (25%), Medium (35%), and Hard (40%). Tier assignment is driven by each prompt's
+            moving average reward <em>R&#772;(q)</em> — the bottom 40% by score go to the Hard tier,
+            ensuring the model repeatedly engages with its hardest failure modes. A balanced 4 on-policy /
+            4 off-policy split per group empirically maximizes performance.
           </p>
 
+          <h3 class="title is-4">Hinting Mechanism</h3>
           <p>
-
-            We introduce AVATAR (Audio-Video Agent for Alignment and Reasoning), a framework that addresses these limitations through two core components: (1) an off-policy training architecture that improves sample efficiency and resolves vanishing advantages by reusing past experiences with greater reward diversity, and (2) Temporal Advantage Shaping (TAS), a novel credit assignment strategy that upweights key reasoning phases during learning.
-
+            When a prompt remains in the Hard tier and KL divergence from the behavior policy drops (policy
+            stops exploring), a pre-computed <em>hint</em> is injected — a short strategic suggestion
+            (e.g., "first locate the object making the sound, then count") generated by a teacher model
+            from full problem context. This unlocks the hardest 20% of the distribution that would
+            otherwise yield zero reward.
           </p>
 
-           <p>
-
-            AVATAR achieves strong performance across various benchmarks, outperforming the Qwen2.5-Omni baseline by +5.4 on MMVU, +4.9 on OmniBench, and +4.5 on Video-Holmes, while demonstrating over 35% higher sample efficiency. These results demonstrate that targeted RL improvements, rather than massive architectural changes, effectively address core multimodal reasoning challenges.
-
+          <h3 class="title is-4">Temporal Advantage Shaping (TAS)</h3>
+          <p>
+            TAS replaces GRPO's uniform credit assignment with a U-shaped parabolic weight. For a
+            sequence of length <em>L</em>, each token at normalized position
+            <em>t&#771; = t/(L&minus;1)</em> receives:
           </p>
+          <p style="text-align:center; font-style:italic;">
+            w<sub>t</sub> = 1.0 + &lambda;<sub>TAS</sub> &middot; (2t&#771; &minus; 1)&sup2;
+          </p>
+          <p>
+            Minimal weight (1.0) at the middle; maximum weight (1.0 + &lambda;<sub>TAS</sub>) at the
+            beginning (planning) and end (synthesis). No learned critic required.
+          </p>
+          <div class="fig-center">
+            <img src="static/images/tas.png" alt="TAS U-shaped weighting" style="width:65%;">
+          </div>
+          <p class="fig-caption"><em>Figure 2.</em> TAS U-shaped parabolic weight amplifies the planning (start) and synthesis (end) of each reasoning chain.</p>
+
+          <h3 class="title is-4">Three-Stage Training Pipeline</h3>
+          <p>
+            Stage 0: cold-start SFT. Stage 1: general visual reasoning. Stage 2: audio-visual alignment
+            (audio captions from Kimi-Audio). Stage 3: fine-grained audio-based localization (stepwise
+            judge reward from InternVL3). TAS is applied throughout all RL stages.
+          </p>
+          <div class="fig-center">
+            <img src="static/images/pipeline.png" alt="Three-Stage Training Pipeline">
+          </div>
+          <p class="fig-caption"><em>Figure 3.</em> AVATAR's three-stage RL curriculum with progressively harder tasks and richer reward functions.</p>
 
         </div>
-
       </div>
-
     </div>
-
   </div>
-
 </section>
 
-
-
+<!-- ── Results ── -->
 <section class="section">
-
-    <div class="container is-max-desktop">
-
-        <div class="columns is-centered">
-
-            <div class="column is-four-fifths">
-
-              <h2 class="title is-3 has-text-centered">Method</h2>
-
-              <div class="content has-text-justified">
-
-                <p>
-
-                  AVATAR is an off-policy reinforcement learning framework that enhances Group Relative Policy Optimization (GRPO) for multimodal video understanding. The framework addresses three core limitations of standard GRPO through two main innovations.
-
-                </p>
-
-               
-
-                <p>
-
-                    <b>Off-Policy Architecture with Stratified Replay Buffer:</b> AVATAR employs a stratified replay buffer divided into three dynamic tiers: Easy (25%), Medium (35%), and Hard (40%). Experiences are assigned based on the policy's moving average reward for each prompt, forming a progressive learning curriculum. This addresses data inefficiency by reusing past experiences and mitigates the vanishing advantage problem by maintaining reward diversity.
-
-                </p>
-
-                <p>
-
-                    <b>Temporal Advantage Shaping (TAS):</b> TAS addresses uniform credit assignment by applying a U-shaped weighting curve that amplifies advantages during crucial planning (beginning) and synthesis (end) stages. For a reasoning sequence of length L, each token's position t is normalized to [0,1], and weights are computed as: w_t = 1.0 + λ_TAS · (2t̃ - 1)², where t̃ = t/(L-1).
-
-                </p>
-
-                <div class="placeholder-box">
-
-                  <img src="static/images/tas.jpg" alt="Temporal Advantage Shaping U-shaped Curve" width="70%">
-
-                </div>
-
-                <p>
-
-                    <b>Three-Stage Training Pipeline:</b> AVATAR is evaluated through a progressive curriculum: Stage 1 develops general visual reasoning, Stage 2 introduces audio-visual alignment, and Stage 3 addresses fine-grained audio-based object localization. Each stage leverages specific reward functions including format rewards, accuracy rewards, self-rewarding mechanisms, and stepwise reasoning judges.
-
-                </p>
-                 <div class="placeholder-box">
-
-                  <img src="static/images/pipeline.jpg" alt="Three-Stage RL Training Pipeline">
-
-                </div>
-
-                <p>
-
-                    <b>Video-Context Reference Score (VCRS):</b> To ensure stable learning signals, AVATAR introduces VCRS, which acts as a multiplicative factor in advantage calculation using a moving average of rewards over the last 20 processed instances, preventing zero-valued advantages that would stall learning.
-
-                </p>
-
-             </div>
-
-            </div>
-
-          </div>
-
-    </div>
-
-</section>
-
-
-
-<section class="section">
-
   <div class="container is-max-desktop">
-
     <h2 class="title is-3 has-text-centered">Results</h2>
 
-
-
+    <!-- Table 1: AV -->
     <div class="columns is-centered">
-
-      <div class="column is-four-fifths">
-
-        <h3 class="title is-4 has-text-centered">Audio-Visual Reasoning Performance</h3>
-
-        <div class="content has-text-justified">
-
-           <p>
-
-               AVATAR significantly outperforms the Qwen2.5-Omni baseline on audio-visual reasoning tasks, with absolute gains of +4.9 on OmniBench, +3.0 on DailyOmni, and +2.3 on AV-Odyssey. The framework also outperforms other GRPO-based methods, surpassing AV-Reasoner by 0.8 and Omni-R1 by 2.2 on OmniBench alignment tasks.
-
-           </p>
-
-           <div class="placeholder-box">
-
-               <img src="static/images/av_table.png" alt="Audio-Visual Benchmark Results (Table 1)">
-
-           </div>
-
+      <div class="column is-full">
+        <h3 class="title is-4 has-text-centered">Table 1 — Audio-Visual Reasoning</h3>
+        <p class="table-caption">
+          AVATAR vs. state-of-the-art audio-video understanding models. Gains shown in
+          <span class="gain-green">green</span> with 95% CI. &dagger; not statistically significant.
+        </p>
+        <div style="overflow-x:auto;">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>OmniBench</th><th>DailyOmni</th><th>AV-Counting</th>
+              <th>AV-Odyssey</th><th>WorldSense</th><th>IntentBench</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" class="row-section">Ola-7B</td></tr>
+            <tr>
+              <td>Baseline</td>
+              <td>45.3</td><td>52.3</td><td>17.4</td><td>25.6</td><td>44.2</td><td>59.1</td>
+            </tr>
+            <tr>
+              <td class="indent">+ GRPO</td>
+              <td>46.8 <span class="gain-green">(+1.5)</span></td>
+              <td>54.1 <span class="gain-green">(+1.8)</span></td>
+              <td>18.2 <span class="gain-green">(+0.8)</span></td>
+              <td>27.0 <span class="gain-green">(+1.4)</span></td>
+              <td>44.7 <span class="gain-green">(+0.5)</span></td>
+              <td>60.3 <span class="gain-green">(+1.2)</span></td>
+            </tr>
+            <tr class="row-winner">
+              <td class="indent avatar-name">+ AVATAR</td>
+              <td><b>47.2</b> <span class="gain-green">(+1.9)</span></td>
+              <td><b>55.7</b> <span class="gain-green">(+3.4)</span></td>
+              <td><b>19.5</b> <span class="gain-green">(+2.1)</span></td>
+              <td><b>28.8</b> <span class="gain-green">(+3.2)</span></td>
+              <td><b>45.0</b> <span class="gain-green">(+0.8)</span></td>
+              <td><b>61.9</b> <span class="gain-green">(+2.8)</span></td>
+            </tr>
+            <tr><td colspan="7" class="row-section">Qwen2.5-Omni</td></tr>
+            <tr>
+              <td>Baseline</td>
+              <td>44.2</td><td>44.0</td><td>22.3</td><td>29.8</td><td>44.2</td><td>63.7</td>
+            </tr>
+            <tr>
+              <td class="indent">+ GRPO</td>
+              <td>45.4 <span class="gain-green">(+1.2)</span></td>
+              <td>44.8 <span class="gain-green">(+0.8)</span></td>
+              <td>22.8 <span class="gain-green">(+0.5)</span></td>
+              <td>31.3 <span class="gain-green">(+1.5)</span></td>
+              <td>45.1 <span class="gain-green">(+0.9)</span></td>
+              <td>63.8 <span class="gain-gray">(+0.1)&dagger;</span></td>
+            </tr>
+            <tr class="row-winner">
+              <td class="indent avatar-name">+ AVATAR</td>
+              <td><b>49.1</b> <span class="gain-green">(+4.9)</span></td>
+              <td><b>47.0</b> <span class="gain-green">(+3.0)</span></td>
+              <td><b>23.1</b> <span class="gain-green">(+0.8)</span></td>
+              <td><b>32.1</b> <span class="gain-green">(+2.3)</span></td>
+              <td><b>46.0</b> <span class="gain-green">(+1.8)</span></td>
+              <td><b>63.9</b> <span class="gain-green">(+0.2)</span></td>
+            </tr>
+          </tbody>
+        </table>
         </div>
-
       </div>
-
     </div>
 
+    <hr class="section-divider">
 
-
+    <!-- Table 2: General Video -->
     <div class="columns is-centered">
+      <div class="column is-full">
+        <h3 class="title is-4 has-text-centered">Table 2 — General Video Understanding &amp; Reasoning</h3>
+        <p class="table-caption">
+          AVATAR vs. state-of-the-art video models. &dagger; not statistically significant.
+        </p>
+        <div style="overflow-x:auto;">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th rowspan="2">Model</th>
+              <th colspan="3" style="border-bottom:2px solid #bbb;">General Video Understanding</th>
+              <th colspan="3" style="border-bottom:2px solid #bbb;">Video Reasoning</th>
+            </tr>
+            <tr>
+              <th>MVBench</th><th>Video-MME</th><th>LVBench</th>
+              <th>Video-Holmes</th><th>MMVU</th><th>TOMATO</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" class="row-section">Ola-7B</td></tr>
+            <tr>
+              <td>Baseline</td>
+              <td>40.1</td><td>59.1</td><td>35.5</td><td>40.1</td><td>56.6</td><td>25.3</td>
+            </tr>
+            <tr>
+              <td class="indent">+ GRPO</td>
+              <td>42.5 <span class="gain-green">(+2.4)</span></td>
+              <td>60.2 <span class="gain-green">(+1.1)</span></td>
+              <td>36.0 <span class="gain-green">(+0.5)</span></td>
+              <td>41.3 <span class="gain-green">(+1.2)</span></td>
+              <td>57.0 <span class="gain-green">(+0.4)</span></td>
+              <td>25.9 <span class="gain-green">(+0.6)</span></td>
+            </tr>
+            <tr class="row-winner">
+              <td class="indent avatar-name">+ AVATAR</td>
+              <td><b>45.4</b> <span class="gain-green">(+5.3)</span></td>
+              <td><b>61.4</b> <span class="gain-green">(+2.3)</span></td>
+              <td><b>36.6</b> <span class="gain-green">(+1.1)</span></td>
+              <td><b>42.4</b> <span class="gain-green">(+2.3)</span></td>
+              <td><b>57.3</b> <span class="gain-green">(+0.7)</span></td>
+              <td><b>26.6</b> <span class="gain-green">(+1.3)</span></td>
+            </tr>
+            <tr><td colspan="7" class="row-section">Qwen2.5-Omni</td></tr>
+            <tr>
+              <td>Baseline</td>
+              <td>66.1</td><td>58.3</td><td>37.2</td><td>40.6</td><td>60.2</td><td>29.0</td>
+            </tr>
+            <tr>
+              <td class="indent">+ GRPO</td>
+              <td>66.3 <span class="gain-green">(+0.2)</span></td>
+              <td>60.5 <span class="gain-green">(+2.2)</span></td>
+              <td>37.8 <span class="gain-green">(+0.6)</span></td>
+              <td>43.2 <span class="gain-green">(+2.6)</span></td>
+              <td>64.0 <span class="gain-green">(+3.8)</span></td>
+              <td>29.2 <span class="gain-gray">(+0.2)&dagger;</span></td>
+            </tr>
+            <tr class="row-winner">
+              <td class="indent avatar-name">+ AVATAR</td>
+              <td><b>66.4</b> <span class="gain-gray">(+0.3)&dagger;</span></td>
+              <td><b>62.8</b> <span class="gain-green">(+4.5)</span></td>
+              <td><b>38.4</b> <span class="gain-green">(+1.2)</span></td>
+              <td><b>45.1</b> <span class="gain-green">(+4.5)</span></td>
+              <td><b>65.6</b> <span class="gain-green">(+5.4)</span></td>
+              <td><b>30.8</b> <span class="gain-green">(+1.8)</span></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
 
+    <hr class="section-divider">
+
+    <!-- Advantage distribution figure -->
+    <div class="columns is-centered">
       <div class="column is-four-fifths">
-
-        <h3 class="title is-4 has-text-centered">General Video Understanding Results</h3>
-
+        <h3 class="title is-4 has-text-centered">AVATAR Resolves the Vanishing Advantage Problem</h3>
         <div class="content has-text-justified">
-
-           <p>
-
-               AVATAR achieves state-of-the-art performance on general video understanding benchmarks, including MVBench (66.4) and LVBench (38.4), and excels in complex reasoning tasks. Notable improvements include +4.5 on Video-Holmes and +5.4 on MMVU, demonstrating the effectiveness of the stratified replay buffer and TAS for multi-step causal inference.
-
-           </p>
-
-           <div class="placeholder-box">
-
-               <img src="static/images/gv_table.png" alt="General Video Understanding Results (Table 2)">
-
-           </div>
-
+          <p>
+            GRPO's advantage distribution collapses to zero when all responses in a group receive
+            similar rewards. AVATAR's stratified replay buffer mixes historically-hard and easy
+            samples, shifting the distribution from a zero-centered spike to a bimodal shape.
+          </p>
+          <div class="pdf-row">
+            <img src="static/images/advantages.png" alt="Advantage distribution comparison" style="width:100%;border-radius:4px;">
+          </div>
+          <p class="fig-caption">
+            <em>Figure 4.</em> Advantage distribution under GRPO (left) collapses to zero.
+            AVATAR (right) maintains a bimodal distribution enabling effective gradient flow.
+          </p>
         </div>
-
       </div>
-
     </div>
 
+    <hr class="section-divider">
 
-
-      <div class="columns is-centered">
-
-        <div class="column is-four-fifths">
-
-          <h3 class="title is-4 has-text-centered">Sample Efficiency & Ablation Studies</h3>
-
-          <div class="content has-text-justified">
-
-            <p>
-
-                AVATAR demonstrates superior sample efficiency, reaching 0.75 accuracy reward in just 2,500 iterations compared to baseline GRPO plateauing at 0.4, representing a 35% efficiency gain. Component-wise analysis shows that both the replay buffer and TAS contribute complementary benefits.
-
-            </p>
-
-            <div class="placeholder-box">
-
-                  <img src="static/images/sample_eff.png" alt="Sample Efficiency Comparison (Figure 4)" width="70%">
-
-             </div>
-
-             <div class="placeholder-box">
-
-                  <img src="static/images/component_wise.png" alt="Component-wise Ablation Study (Table 3)">
-
-             </div>
-
-             <p>
-
-                The ablation studies validate the effectiveness of each component. The curriculum design shows clear progression with Stage 1 RL yielding the largest improvements over SFT, while the U-shaped TAS weighting consistently outperforms linear alternatives and uniform baselines.
-
-             </p>
-
-              <div class="placeholder-box">
-
-                  <img src="static/images/ablation_2.png" alt="Curriculum Design and TAS Ablation (Table 4)">
-
-              </div>
-
+    <!-- Sample efficiency figure -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4 has-text-centered">5&times; Sample Efficiency</h3>
+        <div class="content has-text-justified">
+          <p>
+            AVATAR reaches 0.80 accuracy in 400 iterations (1,600 unique completions), while GRPO
+            fails even after 1,000 iterations (8,000 completions) —
+            <b>5&times; greater sample efficiency</b>, requiring 80% fewer generated completions.
+          </p>
+          <div class="pdf-row">
+            <img src="static/images/sample_eff.png" alt="Sample efficiency comparison" style="width:100%;border-radius:4px;">
           </div>
-
+          <p class="fig-caption">
+            <em>Figure 5.</em> Training accuracy (left) and reward (right) over completions.
+            AVATAR reaches target performance in 5&times; fewer samples than GRPO.
+          </p>
         </div>
-
       </div>
-
-
-
-      <div class="columns is-centered">
-
-        <div class="column is-four-fifths">
-
-          <h3 class="title is-4 has-text-centered">Qualitative Examples</h3>
-
-          <div class="content has-text-justified">
-
-             <p>
-
-                Qualitative examples demonstrate AVATAR's superior cross-modal integration compared to baseline GRPO. AVATAR effectively links visual cues (e.g., "tense expression, eyes darting around") with audio analysis ("hurried and tense tone"), while baseline GRPO makes disconnected observations. The framework shows improved temporal reasoning by tracking emotional progression and enhanced contextual understanding through precise dialogue interpretation.
-
-             </p>
-
-             <div class="placeholder-box">
-
-                 <img src="static/images/qual.png" alt="Qualitative Comparison Examples (Figure 9)">
-
-             </div>
-
-             <p>
-
-                In the examples above, AVATAR demonstrates better cross-modal integration by linking visual cues ("tense expression, his eyes darting around") with audio analysis ("hurried and tense tone when he speaks"), while baseline GRPO makes disconnected observations. AVATAR also shows improved temporal reasoning by tracking emotional progression ("tone shifting from calm to anxious") and enhanced contextual understanding through precise dialogue interpretation ("Sorry, I have a train to catch" indicating abrupt departure).
-
-             </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
     </div>
 
+    <hr class="section-divider">
+
+    <!-- Table 3: Component ablation -->
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <h3 class="title is-4 has-text-centered">Table 3 — Component-Wise Ablation</h3>
+        <p class="table-caption">
+          Each component addresses a specific GRPO limitation. Replay buffer resolves data inefficiency
+          and vanishing advantages; TAS improves credit assignment; hinting escapes local optima.
+        </p>
+        <div style="overflow-x:auto;">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th rowspan="2">Qwen2.5-Omni</th>
+              <th colspan="3" style="border-bottom:2px solid #bbb;">Audio-Visual</th>
+              <th colspan="3" style="border-bottom:2px solid #bbb;">Video Reasoning</th>
+            </tr>
+            <tr>
+              <th>OmniBench</th><th>DailyOmni</th><th>AV-Odyssey</th>
+              <th>Video-MMMU</th><th>VSI-Bench</th><th>Video-TT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Baseline</td>
+              <td>44.2</td><td>44.0</td><td>29.8</td><td>46.8</td><td>25.4</td><td>41.8</td>
+            </tr>
+            <tr>
+              <td class="indent">+ GRPO</td>
+              <td>45.4 <span class="gain-green">(+1.2)</span></td>
+              <td>44.8 <span class="gain-green">(+0.8)</span></td>
+              <td>31.3 <span class="gain-green">(+1.5)</span></td>
+              <td>48.1 <span class="gain-green">(+1.3)</span></td>
+              <td>25.9 <span class="gain-green">(+0.5)</span></td>
+              <td>43.0 <span class="gain-green">(+1.2)</span></td>
+            </tr>
+            <tr>
+              <td class="indent">+ TAS Only (w/ On-Policy GRPO)</td>
+              <td>45.1 <span class="gain-green">(+0.9)</span></td>
+              <td>45.4 <span class="gain-green">(+1.4)</span></td>
+              <td>31.4 <span class="gain-green">(+1.6)</span></td>
+              <td>49.0 <span class="gain-green">(+2.2)</span></td>
+              <td>26.5 <span class="gain-green">(+1.1)</span></td>
+              <td>43.8 <span class="gain-green">(+2.0)</span></td>
+            </tr>
+            <tr>
+              <td class="indent">+ Replay Buffer (w/ Uniform Credit)</td>
+              <td>47.8 <span class="gain-green">(+3.6)</span></td>
+              <td>45.9 <span class="gain-green">(+1.9)</span></td>
+              <td>31.6 <span class="gain-green">(+1.8)</span></td>
+              <td>48.5 <span class="gain-green">(+1.7)</span></td>
+              <td>26.1 <span class="gain-green">(+0.7)</span></td>
+              <td>43.3 <span class="gain-green">(+1.5)</span></td>
+            </tr>
+            <tr class="row-winner">
+              <td class="indent avatar-name">+ AVATAR (Full)</td>
+              <td><b>49.1</b> <span class="gain-green">(+4.9)</span></td>
+              <td><b>47.0</b> <span class="gain-green">(+3.0)</span></td>
+              <td><b>32.1</b> <span class="gain-green">(+2.3)</span></td>
+              <td><b>49.4</b> <span class="gain-green">(+2.6)</span></td>
+              <td><b>26.8</b> <span class="gain-green">(+1.4)</span></td>
+              <td><b>44.2</b> <span class="gain-green">(+2.4)</span></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Table 4: Curriculum + TAS -->
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <h3 class="title is-4 has-text-centered">Table 4 — Training Curriculum &amp; Advantage Shaping Ablation</h3>
+        <p class="table-caption">
+          Staged curriculum shows consistent stage-wise improvements. TAS (parabolic) outperforms all
+          alternative weighting schemes including uniform, linear, and inverse parabolic.
+        </p>
+        <div style="overflow-x:auto;">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Setting</th>
+              <th>OmniBench</th><th>DailyOmni</th><th>AV-Odyssey</th>
+              <th>Video-Holmes</th><th>MMVU</th><th>TOMATO</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" class="row-section">Training Curriculum (Qwen2.5-Omni baseline: 44.2 / 44.0 / 29.8 / 40.6 / 60.2 / 29.0)</td></tr>
+            <tr>
+              <td>SFT Only</td>
+              <td>45.8 <span class="gain-green">(+1.6)</span></td>
+              <td>45.2 <span class="gain-green">(+1.2)</span></td>
+              <td>30.1 <span class="gain-green">(+0.3)</span></td>
+              <td>41.8 <span class="gain-green">(+1.2)</span></td>
+              <td>62.1 <span class="gain-green">(+1.9)</span></td>
+              <td>28.9 <span class="gain-gray">(-0.1)</span></td>
+            </tr>
+            <tr>
+              <td>SFT + Stage 1 RL</td>
+              <td>47.2 <span class="gain-green">(+3.0)</span></td>
+              <td>45.8 <span class="gain-green">(+1.8)</span></td>
+              <td>30.6 <span class="gain-green">(+0.8)</span></td>
+              <td>43.5 <span class="gain-green">(+2.9)</span></td>
+              <td>64.2 <span class="gain-green">(+4.0)</span></td>
+              <td>29.4 <span class="gain-green">(+0.4)</span></td>
+            </tr>
+            <tr>
+              <td>SFT + Stages 1–2 RL</td>
+              <td>48.6 <span class="gain-green">(+4.4)</span></td>
+              <td>46.7 <span class="gain-green">(+2.7)</span></td>
+              <td>31.8 <span class="gain-green">(+2.0)</span></td>
+              <td>44.2 <span class="gain-green">(+3.6)</span></td>
+              <td>65.1 <span class="gain-green">(+4.9)</span></td>
+              <td>30.1 <span class="gain-green">(+1.1)</span></td>
+            </tr>
+            <tr class="row-winner">
+              <td class="avatar-name">SFT + Stages 1–3 RL (AVATAR)</td>
+              <td><b>49.1</b> <span class="gain-green">(+4.9)</span></td>
+              <td><b>47.0</b> <span class="gain-green">(+3.0)</span></td>
+              <td><b>32.1</b> <span class="gain-green">(+2.3)</span></td>
+              <td><b>45.1</b> <span class="gain-green">(+4.5)</span></td>
+              <td><b>65.6</b> <span class="gain-green">(+5.4)</span></td>
+              <td><b>30.8</b> <span class="gain-green">(+1.8)</span></td>
+            </tr>
+
+            <tr><td colspan="7" class="row-section">Advantage Shaping Strategy</td></tr>
+            <tr>
+              <td>Uniform (GRPO)</td>
+              <td>47.8 <span class="gain-green">(+3.6)</span></td>
+              <td>45.9 <span class="gain-green">(+1.9)</span></td>
+              <td>31.6 <span class="gain-green">(+1.8)</span></td>
+              <td>43.7 <span class="gain-green">(+3.1)</span></td>
+              <td>64.8 <span class="gain-green">(+4.6)</span></td>
+              <td>29.3 <span class="gain-green">(+0.3)</span></td>
+            </tr>
+            <tr>
+              <td>Inverse Parabolic</td>
+              <td>46.5 <span class="gain-green">(+2.3)</span></td>
+              <td>45.1 <span class="gain-green">(+1.1)</span></td>
+              <td>30.8 <span class="gain-green">(+1.0)</span></td>
+              <td>42.8 <span class="gain-green">(+2.2)</span></td>
+              <td>63.5 <span class="gain-green">(+3.3)</span></td>
+              <td>29.1 <span class="gain-green">(+0.1)</span></td>
+            </tr>
+            <tr class="row-winner">
+              <td class="avatar-name">TAS — Parabolic (Ours)</td>
+              <td><b>49.1</b> <span class="gain-green">(+4.9)</span></td>
+              <td><b>47.0</b> <span class="gain-green">(+3.0)</span></td>
+              <td><b>32.1</b> <span class="gain-green">(+2.3)</span></td>
+              <td><b>45.1</b> <span class="gain-green">(+4.5)</span></td>
+              <td><b>65.6</b> <span class="gain-green">(+5.4)</span></td>
+              <td><b>30.8</b> <span class="gain-green">(+1.8)</span></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- TAS length figure -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4 has-text-centered">TAS Gains Scale with Reasoning Length</h3>
+        <div class="content has-text-justified">
+          <p>
+            TAS consistently improves performance across reasoning lengths, with gains amplifying as
+            sequences grow longer. The advantage is most pronounced for extended sequences (400+ tokens),
+            particularly on challenging benchmarks like MMVU and Video-Holmes, where uniform credit
+            would dilute the reward signal most severely.
+          </p>
+          <div class="fig-center">
+            <img src="static/images/tas_length.png" alt="TAS gain vs reasoning length">
+          </div>
+          <p class="fig-caption">
+            <em>Figure 6.</em> TAS improvement over GRPO vs. reasoning sequence length on
+            audio-visual (left) and video reasoning (right) benchmarks.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </section>
 
+<!-- ── Qualitative ── -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 has-text-centered">Qualitative Examples</h2>
+        <div class="content has-text-justified">
+          <p>
+            AVATAR demonstrates superior cross-modal integration — linking visual cues ("tense expression,
+            eyes darting around") with audio analysis ("hurried and tense tone when he speaks") — while
+            baseline GRPO makes disconnected observations. AVATAR tracks emotional progression ("tone
+            shifting from calm to anxious") and interprets precise dialogue ("Sorry, I have a train to catch"
+            indicating abrupt departure), rather than falling back on surface-level genre classification.
+          </p>
+          <div class="fig-center">
+            <img src="static/images/qual.png" alt="Qualitative comparison: AVATAR vs GRPO">
+          </div>
+          <p class="fig-caption">
+            Qualitative comparison of AVATAR vs. baseline GRPO on an audio-visual reasoning example
+            from Video-Holmes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-
-
-
+<!-- ── BibTeX ── -->
 <section class="section" id="BibTeX">
-
   <div class="container is-max-desktop content">
-
     <h2 class="title is-3 has-text-centered">BibTeX</h2>
-
     <pre><code>@inproceedings{kulkarni2026avatar,
   title={AVATAR: Reinforcement Learning to See, Hear, and Reason Over Video},
   author={Kulkarni, Yogesh and Fazli, Pooyan},
   booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
   year={2026}
 }</code></pre>
-
   </div>
-
 </section>
 
-
-
-
-
 <footer class="footer">
-
   <div class="container">
-
-    <div class="content has-text-centered">
-
-     </div>
-
     <div class="columns is-centered">
-
       <div class="column is-8">
-
         <div class="content has-text-centered">
-
-          <p>
-
-            Website template adapted from <a href="https://nerfies.github.io/">Nerfies</a>.
-
-          </p>
-
+          <p>Website template adapted from <a href="https://nerfies.github.io/">Nerfies</a>.</p>
         </div>
-
       </div>
-
     </div>
-
   </div>
-
 </footer>
 
-
-
 <script>
-
 document.addEventListener('DOMContentLoaded', () => {
-
-  const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-
-  if ($navbarBurgers.length > 0) {
-
-    $navbarBurgers.forEach( el => {
-
-      el.addEventListener('click', () => {
-
-        const target = el.dataset.target;
-
-        const $target = document.getElementById(target);
-
-        el.classList.toggle('is-active');
-
-        if ($target) {
-
-            $target.classList.toggle('is-active');
-
-        }
-
-      });
-
+  const burgers = Array.from(document.querySelectorAll('.navbar-burger'));
+  burgers.forEach(el => {
+    el.addEventListener('click', () => {
+      const target = document.getElementById(el.dataset.target);
+      el.classList.toggle('is-active');
+      if (target) target.classList.toggle('is-active');
     });
-
-  }
-
-
-
+  });
 });
-
 </script>
 
-
-
 </body>
-
 </html>
